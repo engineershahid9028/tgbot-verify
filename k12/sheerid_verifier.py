@@ -159,24 +159,32 @@ class SheerIDVerifier:
                     continue
 
                 # Step 2: Teacher Info
-                if step == "collectTeacherPersonalInfo":
-                    body = {
-                        "organization": {
-                            "id": school["id"],
-                            "idExtended": school["idExtended"],
-                            "name": school["name"]
-                        },
-                        "deviceFingerprintHash": self.device_fingerprint,
-                        "locale": "en-US"
-                    }
+               if step == "collectTeacherPersonalInfo":
+    body = {
+        # 🔥 REQUIRED AGAIN
+        "firstName": first_name,
+        "lastName": last_name,
+        "email": email,
+
+        # School info
+        "organization": {
+            "id": school["id"],
+            "idExtended": school["idExtended"],
+            "name": school["name"]
+        },
+
+        "employmentStatus": "ACTIVE",
+        "deviceFingerprintHash": self.device_fingerprint,
+        "locale": "en-US"
+    }
                     data, status = self._request(
-                        "POST",
-                        f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectTeacherPersonalInfo",
-                        body
-                    )
-                    if status != 200:
-                        raise Exception(data)
-                    continue
+        "POST",
+        f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectTeacherPersonalInfo",
+        body
+    )
+    if status != 200:
+        raise Exception(data)
+    continue
 
                 # Step 3: Skip SSO
                 if step == "sso":
