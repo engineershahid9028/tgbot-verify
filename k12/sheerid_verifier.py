@@ -136,7 +136,10 @@ class SheerIDVerifier:
                     "email": email,
                     "phoneNumber": "",
                     "deviceFingerprintHash": self.device_fingerprint,
-                    "locale": "en-US"
+                    "locale": "en-US",
+                    "metadata": {
+                        "verificationId": self.verification_id
+                    }
                 }
                 data, status = self._request(
                     "POST",
@@ -148,18 +151,22 @@ class SheerIDVerifier:
                 continue
 
             if step == "collectTeacherPersonalInfo":
+                # ✅ CORRECTED PAYLOAD (NO employmentStatus)
                 body = {
                     "firstName": first_name,
                     "lastName": last_name,
+                    "birthDate": birth_date,
                     "email": email,
                     "organization": {
                         "id": school["id"],
                         "idExtended": school["idExtended"],
                         "name": school["name"]
                     },
-                    "employmentStatus": "ACTIVE",
                     "deviceFingerprintHash": self.device_fingerprint,
-                    "locale": "en-US"
+                    "locale": "en-US",
+                    "metadata": {
+                        "verificationId": self.verification_id
+                    }
                 }
                 data, status = self._request(
                     "POST",
