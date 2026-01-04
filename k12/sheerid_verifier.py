@@ -33,42 +33,9 @@ logger = logging.getLogger(__name__)
 class SheerIDVerifier:
 
     def __init__(self, verification_id: str):
-        self.verification_id = verification_id
-
-    @staticmethod
-    def parse_verification_id(url: str):
-        import re
-        if not url:
-            return None
-        match = re.search(r'verificationId=([a-f0-9]+)', url, re.IGNORECASE)
-        if match:
-            return match.group(1)
-        return None
-
-
-    
-    def __del__(self):
-        try:
-            self.client.close()
-        except Exception:
-            pass
-
-    @staticmethod
-    def _gen_device_fingerprint() -> str:
-        return ''.join(random.choice('0123456789abcdef') for _ in range(32))
-
-    def _request(self, method: str, url: str, body: Dict = None) -> Tuple[Dict, int]:
-        r = self.client.request(
-            method=method,
-            url=url,
-            json=body,
-            headers={"Content-Type": "application/json"}
-        )
-        try:
-            data = r.json()
-        except Exception:
-            data = {}
-        return data, r.status_code
+    self.verification_id = verification_id
+    self.device_fingerprint = self._gen_device_fingerprint()
+    self.client = httpx.Client(timeout=30.0)
 
     def _upload(self, url: str, content: bytes, mime: str):
         r = self.client.put(
