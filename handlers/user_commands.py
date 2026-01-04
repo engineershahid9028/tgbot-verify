@@ -154,3 +154,37 @@ async def use_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db: Da
             f"Credits added: {result}\n"
             f"Current balance: {user['balance']}"
         )
+async def checkin_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db: Database):
+    """Daily check-in command"""
+    if await reject_group_command(update):
+        return
+
+    user_id = update.effective_user.id
+
+    if db.is_user_blocked(user_id):
+        await update.message.reply_text("🚫 You are blocked.")
+        return
+
+    if not db.user_exists(user_id):
+        await update.message.reply_text(
+            "❗ You are not registered yet. Use /start first."
+        )
+        return
+
+    if not db.can_checkin(user_id):
+        await update.message.reply_text(
+            "❌ You have already checked in today. Come back tomorrow."
+        )
+        return
+
+    if db.checkin(user_id):
+        user = db.get_user(user_id)
+        await update.message.reply_text(
+            f"✅ Check-in successful!\n"
+            f"+1 credit\n"
+            f"Current balance: {user['balance']}"
+        )
+    else:
+        await update.message.reply_text(
+            "❌ You have already checked in today."
+        )
