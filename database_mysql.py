@@ -24,14 +24,16 @@ class MySQLDatabase:
         
         # 从环境变量读取配置（推荐）或使用默认值
         self.config = {
-            'host': os.getenv('MYSQL_HOST', 'localhost'),
-            'port': int(os.getenv('MYSQL_PORT', 3306)),
-            'user': os.getenv('MYSQL_USER', 'tgbot_user'),
-            'password': os.getenv('MYSQL_PASSWORD', 'your_password_here'),
-            'database': os.getenv('MYSQL_DATABASE', 'tgbot_verify'),
-            'charset': 'utf8mb4',
-            'autocommit': False,
-        }
+    "host": os.environ["MYSQL_HOST"],
+    "port": int(os.getenv("MYSQL_PORT") or 3306),
+    "user": os.environ["MYSQL_USER"],
+    "password": os.environ["MYSQL_PASSWORD"],
+    "database": os.environ["MYSQL_DATABASE"],
+    "charset": "utf8mb4",
+    "cursorclass": pymysql.cursors.DictCursor,
+    "autocommit": True,
+}
+
         logger.info(f"MySQL 数据库初始化: {self.config['user']}@{self.config['host']}/{self.config['database']}")
         self.init_database()
 
