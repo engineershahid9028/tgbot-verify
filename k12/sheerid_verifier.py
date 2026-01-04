@@ -125,4 +125,4 @@ class SheerIDVerifier:
 
         # ---- step routing ----
         while True:
-            step = self._get_current_step_
+            step = self._get_current_step()
