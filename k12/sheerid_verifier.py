@@ -110,6 +110,15 @@ class SheerIDVerifier:
                         "POST",
                         f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectPersonalInfo",
                         body
+                            def _get_current_step(self) -> str:
+        data, status = self._request(
+            "GET",
+            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}"
+        )
+        if status != 200:
+            raise Exception(f"获取验证状态失败: {data}")
+        return data.get("currentStep")
+
                     )
                     if status != 200:
                         raise Exception(data)
