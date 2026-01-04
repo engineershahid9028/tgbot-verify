@@ -1,7 +1,7 @@
 """
 SheerID 教师验证主程序（最终稳定版）
 """
-
+import time
 import re
 import random
 import logging
@@ -126,5 +126,8 @@ class SheerIDVerifier:
         # ---- step routing ----
         while True:
     step = self._get_current_step()
+    logger.info(f"SheerID status: {step}")
+    time.sleep(5)  # wait 5 seconds between checks
+
     
 
