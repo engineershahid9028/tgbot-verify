@@ -33,27 +33,25 @@ logger = logging.getLogger(__name__)
 class SheerIDVerifier:
 
     def __init__(self, verification_id: str):
-    self.verification_id = verification_id
-    self.device_fingerprint = self._gen_device_fingerprint()
-    self.client = httpx.Client(timeout=30.0)
+        self.verification_id = verification_id
+        self.device_fingerprint = self._gen_device_fingerprint()
+        self.client = httpx.Client(timeout=30.0)
 
-    def _upload(self, url: str, content: bytes, mime: str):
-        r = self.client.put(
-            url,
-            content=content,
-            headers={"Content-Type": mime},
-            timeout=60.0
-        )
-        return 200 <= r.status_code < 300
+    @staticmethod
+    def parse_verification_id(url: str):
+        import re
+        if not url:
+            return None
+        match = re.search(r'verificationId=([a-f0-9]+)', url, re.IGNORECASE)
+        if match:
+            return match.group(1)
+        return None
 
-    def _get_current_step(self) -> str:
-        data, status = self._request(
-            "GET",
-            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}"
-        )
-        if status != 200:
-            raise Exception(f"获取验证状态失败: {data}")
-        return data.get("currentStep")
+    def __del__(self):
+        try:
+            self.client.close()
+        except Exception:
+            pass
 
     def verify(self,
                first_name: str = None,
