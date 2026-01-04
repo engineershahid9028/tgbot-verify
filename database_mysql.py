@@ -13,29 +13,29 @@ from dotenv import load_dotenv
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+import os
+import pymysql
 
-
-class MySQLDatabase:
-    """MySQL 数据库管理类"""
-
+class Database:
     def __init__(self):
-        """初始化数据库连接"""
-        import os
-        
-        # 从环境变量读取配置（推荐）或使用默认值
         self.config = {
-    "host": os.environ["MYSQL_HOST"],
-    "port": int(os.getenv("MYSQL_PORT") or 3306),
-    "user": os.environ["MYSQL_USER"],
-    "password": os.environ["MYSQL_PASSWORD"],
-    "database": os.environ["MYSQL_DATABASE"],
-    "charset": "utf8mb4",
-    "cursorclass": pymysql.cursors.DictCursor,
-    "autocommit": True,
-}
+            "host": os.environ.get("MYSQL_HOST"),
+            "port": int(os.environ.get("MYSQL_PORT") or 3306),
+            "user": os.environ.get("MYSQL_USER"),
+            "password": os.environ.get("MYSQL_PASSWORD"),
+            "database": os.environ.get("MYSQL_DATABASE"),
+            "charset": "utf8mb4",
+            "cursorclass": pymysql.cursors.DictCursor,
+            "autocommit": True,
+        }
 
-        logger.info(f"MySQL 数据库初始化: {self.config['user']}@{self.config['host']}/{self.config['database']}")
+        # 🔴 HARD FAIL if anything is missing (no silent localhost)
+        missing = [k for k, v in self.config.items() if v in (None, "", 0)]
+        if missing:
+            raise RuntimeError(f"Missing MySQL env vars: {missing}")
+
         self.init_database()
+
 
     def get_connection(self):
         """获取数据库连接"""
