@@ -30,24 +30,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 class SheerIDVerifier:
+
     def __init__(self, verification_id: str):
         self.verification_id = verification_id
-        self.device_fingerprint = self._gen_device_fingerprint()
-        self.client = httpx.Client(timeout=30.0)
-@staticmethod
-def parse_verification_id(url: str) -> Optional[str]:
-    """
-    从 SheerID URL 中解析 verificationId
-    """
-    if not url:
-        return None
-    match = re.search(r'verificationId=([a-f0-9]+)', url, re.IGNORECASE)
-    if match:
-        return match.group(1)
-    return None
 
+    @staticmethod
+    def parse_verification_id(url: str):
+        import re
+        if not url:
+            return None
+        match = re.search(r'verificationId=([a-f0-9]+)', url, re.IGNORECASE)
+        if match:
+            return match.group(1)
+        return None
+
+
+    
     def __del__(self):
         try:
             self.client.close()
