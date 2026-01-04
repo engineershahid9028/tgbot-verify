@@ -548,5 +548,5 @@ class Database:
 
 
 # 创建全局实例的别名，保持与SQLite版本的兼容性
-Database = MySQLDatabase
+
 
