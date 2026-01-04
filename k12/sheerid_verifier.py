@@ -178,15 +178,16 @@ while True:
         continue
 
     # ✅ ADD THIS BLOCK (FINAL FIX)
-    if step == "emailLoop":
-        logger.info("SheerID is waiting for email verification")
-        return {
-            "success": True,
-            "pending": True,
-            "verification_id": self.verification_id,
-            "status": "email_verification_required",
-            "message": "SheerID requires email verification. Please check your email or use a school email address."
-        }
+            if step == "emailLoop":
+            logger.info("SheerID is waiting for email verification")
+            return {
+                "success": True,
+                "pending": True,
+                "verification_id": self.verification_id,
+                "status": "email_verification_required",
+                "message": "SheerID requires email verification. Please check your email or use a school email address."
+            }
+
 
     if step == "sso":
         self._request(
