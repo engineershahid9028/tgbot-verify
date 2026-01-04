@@ -228,9 +228,10 @@ async def verify3_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db
     semaphore = get_verification_semaphore("spotify_student")
 
     try:
-        async with semaphore:
+    async with semaphore:
         verifier = SpotifyVerifier(verification_id)
-            result = await asyncio.to_thread(verifier.verify)
+        result = await asyncio.to_thread(verifier.verify)
+
 
         db.add_verification(
             user_id,
