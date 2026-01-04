@@ -125,23 +125,7 @@ class SheerIDVerifier:
 
         # ---- step routing ----
                 while True:
-            step = self._get_current_step()
-            logger.info(f"SheerID status: {step}")
-
-            if step in ("pending", "manualReview"):
-                break
-
-            if step == "approved":
-                return {
-                    "success": True,
-                    "verification_id": self.verification_id,
-                    "status": "approved"
-                }
-
-            if step == "error":
-                raise Exception("SheerID verification failed")
-
-            time.sleep(5)
+    step = self._get_current_step()
 
 
     
