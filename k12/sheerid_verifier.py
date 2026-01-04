@@ -124,111 +124,86 @@ class SheerIDVerifier:
         png_size = len(png_data)
 
         # ---- step routing ----
-        while True:
-            step = self._get_current_step()
-            logger.info(f"当前 SheerID 步骤: {step}")
+        # ---- step routing ----
+while True:
+    step = self._get_current_step()
+    logger.info(f"当前 SheerID 步骤: {step}")
 
-            if step == "collectPersonalInfo":
-                body = {
-                    "firstName": first_name,
-                    "lastName": last_name,
-                    "birthDate": birth_date,
-                    "email": email,
-                    "phoneNumber": "",
-                    "deviceFingerprintHash": self.device_fingerprint,
-                    "locale": "en-US",
-                    "metadata": {
-                        "verificationId": self.verification_id
-                    }
-                }
-                data, status = self._request(
-                    "POST",
-                    f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectPersonalInfo",
-                    body
-                )
-                if status != 200:
-                    raise Exception(data)
-                continue
-
-            if step == "collectTeacherPersonalInfo":
-                # ✅ CORRECTED PAYLOAD (NO employmentStatus)
-                body = {
-                    "firstName": first_name,
-                    "lastName": last_name,
-                    "birthDate": birth_date,
-                    "email": email,
-                    "organization": {
-                        "id": school["id"],
-                        "idExtended": school["idExtended"],
-                        "name": school["name"]
-                    },
-                    "deviceFingerprintHash": self.device_fingerprint,
-                    "locale": "en-US",
-                    "metadata": {
-                        "verificationId": self.verification_id
-                    }
-                }
-                data, status = self._request(
-                    "POST",
-                    f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectTeacherPersonalInfo",
-                    body
-                )
-                if status != 200:
-                    raise Exception(data)
-                continue
-
-            if step == "sso":
-                self._request(
-                    "DELETE",
-                    f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/sso"
-                )
-                continue
-
-            if step == "docUpload":
-                break
-
-            if step in ("pending", "approved"):
-                return {
-                    "success": True,
-                    "pending": step == "pending",
-                    "verification_id": self.verification_id
-                }
-
-            if step == "error":
-                raise Exception("SheerID error state")
-
-        # ---- document upload ----
+    if step == "collectPersonalInfo":
         body = {
-            "files": [
-                {"fileName": "teacher.pdf", "mimeType": "application/pdf", "fileSize": pdf_size},
-                {"fileName": "teacher.png", "mimeType": "image/png", "fileSize": png_size}
-            ]
+            "firstName": first_name,
+            "lastName": last_name,
+            "birthDate": birth_date,
+            "email": email,
+            "phoneNumber": "",
+            "deviceFingerprintHash": self.device_fingerprint,
+            "locale": "en-US",
+            "metadata": {
+                "verificationId": self.verification_id
+            }
         }
-
         data, status = self._request(
             "POST",
-            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/docUpload",
+            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectPersonalInfo",
             body
         )
         if status != 200:
-            raise Exception("docUpload failed")
+            raise Exception(data)
+        continue
 
-        pdf_url = data["documents"][0]["uploadUrl"]
-        png_url = data["documents"][1]["uploadUrl"]
-
-        if not self._upload(pdf_url, pdf_data, "application/pdf"):
-            raise Exception("PDF upload failed")
-        if not self._upload(png_url, png_data, "image/png"):
-            raise Exception("PNG upload failed")
-
-        self._request(
+    if step == "collectTeacherPersonalInfo":
+        body = {
+            "firstName": first_name,
+            "lastName": last_name,
+            "birthDate": birth_date,
+            "email": email,
+            "organization": {
+                "id": school["id"],
+                "idExtended": school["idExtended"],
+                "name": school["name"]
+            },
+            "deviceFingerprintHash": self.device_fingerprint,
+            "locale": "en-US",
+            "metadata": {
+                "verificationId": self.verification_id
+            }
+        }
+        data, status = self._request(
             "POST",
-            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/completeDocUpload"
+            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectTeacherPersonalInfo",
+            body
         )
+        if status != 200:
+            raise Exception(data)
+        continue
 
+    # ✅ ADD THIS BLOCK (FINAL FIX)
+    if step == "emailLoop":
+        logger.info("SheerID is waiting for email verification")
         return {
             "success": True,
             "pending": True,
             "verification_id": self.verification_id,
-            "message": "文档已提交，等待审核"
+            "status": "email_verification_required",
+            "message": "SheerID requires email verification. Please check your email or use a school email address."
         }
+
+    if step == "sso":
+        self._request(
+            "DELETE",
+            f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/sso"
+        )
+        continue
+
+    if step == "docUpload":
+        break
+
+    if step in ("pending", "approved"):
+        return {
+            "success": True,
+            "pending": step == "pending",
+            "verification_id": self.verification_id
+        }
+
+    if step == "error":
+        raise Exception("SheerID error state")
