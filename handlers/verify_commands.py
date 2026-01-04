@@ -179,7 +179,6 @@ async def verify2_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db
             f"已退回 {VERIFY_COST} 积分"
         )
 
-
 async def verify3_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db: Database):
     """处理 /verify3 命令 - Spotify Student"""
     user_id = update.effective_user.id
@@ -193,53 +192,43 @@ async def verify3_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db
         return
 
     if not context.args:
-        await update.message.reply_text(
-            get_verify_usage_message("/verify3", "Spotify Student")
-        )
+        await update.message.reply_text("使用方法: /verify3 <SheerID链接>")
         return
 
     url = context.args[0]
     user = db.get_user(user_id)
+
     if user["balance"] < VERIFY_COST:
-        await update.message.reply_text(
-            get_insufficient_balance_message(user["balance"])
-        )
+        await update.message.reply_text("积分不足。")
         return
 
-    # 解析 verificationId
     verification_id = SpotifyVerifier.parse_verification_id(url)
     if not verification_id:
-        await update.message.reply_text("无效的 SheerID 链接，请检查后重试。")
+        await update.message.reply_text("无效的 SheerID 链接。")
         return
 
     if not db.deduct_balance(user_id, VERIFY_COST):
-        await update.message.reply_text("扣除积分失败，请稍后重试。")
+        await update.message.reply_text("扣费失败。")
         return
 
-    processing_msg = await update.message.reply_text(
-        f"🎵 开始处理 Spotify Student 认证...\n"
-        f"已扣除 {VERIFY_COST} 积分\n\n"
-        "📝 正在生成学生信息...\n"
-        "🎨 正在生成学生证 PNG...\n"
-        "📤 正在提交文档..."
-    )
+    processing_msg = await update.message.reply_text("🎵 正在处理 Spotify 学生认证，请稍候...")
 
-    # 使用信号量控制并发
     semaphore = get_verification_semaphore("spotify_student")
 
     try:
-    async with semaphore:
-        verifier = SpotifyVerifier(verification_id)
-        result = await asyncio.to_thread(verifier.verify)
-
+        async with semaphore:
+            verifier = SpotifyVerifier(verification_id)
+            result = await asyncio.to_thread(verifier.verify)
     except Exception as e:
-        logger.error("Spotify 验证过程出错: %s", e)
         db.add_balance(user_id, VERIFY_COST)
-        await processing_msg.edit_text(
-            f"❌ 处理过程中出现错误：{str(e)}\n\n"
-            f"已退回 {VERIFY_COST} 积分"
-        )
+        await processing_msg.edit_text(f"❌ 发生错误：{e}")
+        return
 
+    if result.get("success"):
+        await processing_msg.edit_text("✅ Spotify 学生认证成功！")
+    else:
+        db.add_balance(user_id, VERIFY_COST)
+        await processing_msg.edit_text("❌ Spotify 学生认证失败，积分已退回。")
 
 async def verify4_command(update: Update, context: ContextTypes.DEFAULT_TYPE, db: Database):
     """处理 /verify4 命令 - Bolt.new Teacher（自动获取code版）"""
