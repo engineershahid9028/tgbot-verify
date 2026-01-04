@@ -36,6 +36,10 @@ class SheerIDVerifier:
         self.verification_id = verification_id
         self.device_fingerprint = self._gen_device_fingerprint()
         self.client = httpx.Client(timeout=30.0)
+    @staticmethod
+    def _gen_device_fingerprint() -> str:
+        import random
+        return ''.join(random.choice('0123456789abcdef') for _ in range(32))
 
     @staticmethod
     def parse_verification_id(url: str):
