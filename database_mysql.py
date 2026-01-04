@@ -15,26 +15,29 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 import os
 import pymysql
+from urllib.parse import urlparse
 
 class Database:
     def __init__(self):
+        mysql_url = os.environ.get("MYSQL_URL")
+        if not mysql_url:
+            raise RuntimeError("MYSQL_URL is not set")
+
+        parsed = urlparse(mysql_url)
+
         self.config = {
-            "host": os.environ.get("MYSQL_HOST"),
-            "port": int(os.environ.get("MYSQL_PORT") or 3306),
-            "user": os.environ.get("MYSQL_USER"),
-            "password": os.environ.get("MYSQL_PASSWORD"),
-            "database": os.environ.get("MYSQL_DATABASE"),
+            "host": parsed.hostname,
+            "port": parsed.port or 3306,
+            "user": parsed.username,
+            "password": parsed.password,
+            "database": parsed.path.lstrip("/"),
             "charset": "utf8mb4",
             "cursorclass": pymysql.cursors.DictCursor,
             "autocommit": True,
         }
 
-        # 🔴 HARD FAIL if anything is missing (no silent localhost)
-        missing = [k for k, v in self.config.items() if v in (None, "", 0)]
-        if missing:
-            raise RuntimeError(f"Missing MySQL env vars: {missing}")
-
         self.init_database()
+
 
 
     def get_connection(self):
