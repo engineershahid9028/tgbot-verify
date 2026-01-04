@@ -134,7 +134,7 @@ class SheerIDVerifier:
             png_size = len(png_data)
 
             # 动态执行 SheerID 步骤
-            while True:
+                        while True:
                 step = self._get_current_step()
                 logger.info(f"当前 SheerID 步骤: {step}")
 
@@ -149,17 +149,20 @@ class SheerIDVerifier:
                         "deviceFingerprintHash": self.device_fingerprint,
                         "locale": "en-US"
                     }
+
                     data, status = self._request(
                         "POST",
                         f"{SHEERID_BASE_URL}/rest/v2/verification/{self.verification_id}/step/collectPersonalInfo",
                         body
                     )
+
                     if status != 200:
                         raise Exception(data)
+
                     continue
 
                 # Step 2: Teacher Info
-                               if step == "collectTeacherPersonalInfo":
+                if step == "collectTeacherPersonalInfo":
                     body = {
                         "firstName": first_name,
                         "lastName": last_name,
@@ -197,6 +200,19 @@ class SheerIDVerifier:
                 if step == "docUpload":
                     break
 
+                # Waiting or approved
+                if step in ("pending", "approved"):
+                    return {
+                        "success": True,
+                        "pending": step == "pending",
+                        "verification_id": self.verification_id
+                    }
+
+                # Error state
+                if step == "error":
+                    raise Exception("SheerID 已进入 error 状态，必须重新创建 verification")
+
+                
                 # 等待或成功
                 if step in ("pending", "approved"):
                     return {
