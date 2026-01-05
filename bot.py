@@ -59,6 +59,7 @@ def main():
         .concurrent_updates(True)  # 🔥 关键：启用并发处理多个命令
         .build()
     )
+application.bot_data["SHEERID_TOKEN"] = SHEERID_TOKEN
 
     # 注册用户命令（使用 partial 传递 db 参数）
     application.add_handler(CommandHandler("start", partial(start_command, db=db)))
@@ -75,6 +76,23 @@ def main():
     application.add_handler(CommandHandler("verify3", partial(verify3_command, db=db)))
     application.add_handler(CommandHandler("verify4", partial(verify4_command, db=db)))
     application.add_handler(CommandHandler("getV4Code", partial(getV4Code_command, db=db)))
+# ===== Military / Veterans Verification =====
+from military.handler import *
+
+military_handler = ConversationHandler(
+    entry_points=[CommandHandler("verify_military", start)],
+    states={
+        FIRST: [MessageHandler(filters.TEXT, first)],
+        LAST: [MessageHandler(filters.TEXT, last)],
+        EMAIL: [MessageHandler(filters.TEXT, email)],
+        DOB: [MessageHandler(filters.TEXT, dob)],
+        BRANCH: [MessageHandler(filters.TEXT, branch)],
+        STATUS: [MessageHandler(filters.TEXT, finalize)],
+    },
+    fallbacks=[],
+)
+
+application.add_handler(military_handler)
 
     # 注册管理员命令
     application.add_handler(CommandHandler("addbalance", partial(addbalance_command, db=db)))
