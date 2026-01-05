@@ -1,13 +1,18 @@
 """Telegram 机器人主程序"""
 import logging
 from functools import partial
-from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
-from military.handler import *
 
-from telegram.ext import Application, CommandHandler
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
-from config import BOT_TOKEN
+from config import BOT_TOKEN, SHEERID_TOKEN
 from database_mysql import Database
+
 from handlers.user_commands import (
     start_command,
     about_command,
@@ -34,7 +39,10 @@ from handlers.admin_commands import (
     broadcast_command,
 )
 
-# 配置日志
+# military
+from military.handler import *
+
+# logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
@@ -42,26 +50,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def error_handler(update: object, context) -> None:
-    """全局错误处理"""
-    logger.exception("处理更新时发生异常: %s", context.error, exc_info=context.error)
+async def error_handler(update, context):
+    logger.exception("处理更新时发生异常", exc_info=context.error)
 
 
 def main():
-    """主函数"""
-    # 初始化数据库
+    # init db
     db = Database()
 
-    # 创建应用 - 启用并发处理
+    # build application
     application = (
         Application.builder()
         .token(BOT_TOKEN)
-        .concurrent_updates(True)  # 🔥 关键：启用并发处理多个命令
+        .concurrent_updates(True)
         .build()
     )
-application.bot_data["SHEERID_TOKEN"] = SHEERID_TOKEN
 
-    # 注册用户命令（使用 partial 传递 db 参数）
+    # set SheerID token
+    application.bot_data["SHEERID_TOKEN"] = SHEERID_TOKEN
+
+    # ================= USER COMMANDS =================
     application.add_handler(CommandHandler("start", partial(start_command, db=db)))
     application.add_handler(CommandHandler("about", partial(about_command, db=db)))
     application.add_handler(CommandHandler("help", partial(help_command, db=db)))
@@ -70,31 +78,29 @@ application.bot_data["SHEERID_TOKEN"] = SHEERID_TOKEN
     application.add_handler(CommandHandler("invite", partial(invite_command, db=db)))
     application.add_handler(CommandHandler("use", partial(use_command, db=db)))
 
-    # 注册验证命令
+    # ================= VERIFY COMMANDS =================
     application.add_handler(CommandHandler("verify", partial(verify_command, db=db)))
     application.add_handler(CommandHandler("verify2", partial(verify2_command, db=db)))
     application.add_handler(CommandHandler("verify3", partial(verify3_command, db=db)))
     application.add_handler(CommandHandler("verify4", partial(verify4_command, db=db)))
     application.add_handler(CommandHandler("getV4Code", partial(getV4Code_command, db=db)))
-# ===== Military / Veterans Verification =====
-from military.handler import *
 
-military_handler = ConversationHandler(
-    entry_points=[CommandHandler("verify_military", start)],
-    states={
-        FIRST: [MessageHandler(filters.TEXT, first)],
-        LAST: [MessageHandler(filters.TEXT, last)],
-        EMAIL: [MessageHandler(filters.TEXT, email)],
-        DOB: [MessageHandler(filters.TEXT, dob)],
-        BRANCH: [MessageHandler(filters.TEXT, branch)],
-        STATUS: [MessageHandler(filters.TEXT, finalize)],
-    },
-    fallbacks=[],
-)
+    # ================= MILITARY VERIFICATION =================
+    military_handler = ConversationHandler(
+        entry_points=[CommandHandler("verify_military", start)],
+        states={
+            FIRST: [MessageHandler(filters.TEXT, first)],
+            LAST: [MessageHandler(filters.TEXT, last)],
+            EMAIL: [MessageHandler(filters.TEXT, email)],
+            DOB: [MessageHandler(filters.TEXT, dob)],
+            BRANCH: [MessageHandler(filters.TEXT, branch)],
+            STATUS: [MessageHandler(filters.TEXT, finalize)],
+        },
+        fallbacks=[],
+    )
+    application.add_handler(military_handler)
 
-application.add_handler(military_handler)
-
-    # 注册管理员命令
+    # ================= ADMIN COMMANDS =================
     application.add_handler(CommandHandler("addbalance", partial(addbalance_command, db=db)))
     application.add_handler(CommandHandler("block", partial(block_command, db=db)))
     application.add_handler(CommandHandler("white", partial(white_command, db=db)))
@@ -103,7 +109,7 @@ application.add_handler(military_handler)
     application.add_handler(CommandHandler("listkeys", partial(listkeys_command, db=db)))
     application.add_handler(CommandHandler("broadcast", partial(broadcast_command, db=db)))
 
-    # 注册错误处理器
+    # error handler
     application.add_error_handler(error_handler)
 
     logger.info("机器人启动中...")
