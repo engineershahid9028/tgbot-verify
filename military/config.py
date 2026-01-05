@@ -1,5 +1,15 @@
-# military/config.py
+# config.py
 
-PROGRAM_ID = "YOUR_VETERANS_PROGRAM_ID"
+BOT_TOKEN = "8231536953:AAEhlBsv_J_mB3z9dxDinh45spaT0nLCoJA"
 
-BASE_URL = "https://services.sheerid.com/rest/v2/verification"
+# MODE: MOCK or REAL
+SHEERID_MODE = "REAL"  # use MOCK for learning
+
+# ===== REAL SHEERID CREDENTIALS =====
+SHEERID_CLIENT_ID = "YOUR_CLIENT_ID"
+SHEERID_CLIENT_SECRET = "YOUR_CLIENT_SECRET"
+SHEERID_OAUTH_URL = "https://services.sheerid.com/oauth/token"
+
+# Program IDs
+SHEERID_VETERANS_PROGRAM_ID = "YOUR_VETERANS_PROGRAM_ID"
+
