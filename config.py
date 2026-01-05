@@ -9,6 +9,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME", "engrshahid")
 CHANNEL_URL = os.getenv("CHANNEL_URL", "https://t.me/Engineershahidmughal")
+SHEERID_TOKEN = "DUMMY_SHEERID_TOKEN"
 
 # 管理员配置
 ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "7575476523"))
