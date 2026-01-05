@@ -1,6 +1,8 @@
 """Telegram 机器人主程序"""
 import logging
 from functools import partial
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
+from military.handler import *
 
 from telegram.ext import Application, CommandHandler
 
