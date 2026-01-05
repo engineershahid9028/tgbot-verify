@@ -73,8 +73,7 @@ def get_help_message(is_admin: bool = False) -> str:
         f"/verify4 <link> - Bolt.new Teacher (−{VERIFY_COST} credits)\n"
         f"/verify5 <link> - YouTube Student Premium (−{VERIFY_COST} credits)\n\n"
         "/getV4Code <verification_id> - Get Bolt.new reward code\n"
-        "/help - Show this help message\n\n"
-        f"❓ Verification failed? See: {HELP_NOTION_URL}\n"
+        
     )
 
     if is_admin:
