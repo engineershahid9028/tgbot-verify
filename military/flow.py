@@ -2,7 +2,7 @@
 
 from military.config import PROGRAM_ID
 from military.utils import SheerIDClient
-from engine.sheerid_engine import SheerIDEngine
+from military.engine.sheerid_engine import SheerIDEngine
 
 class MilitaryVerifier:
     def __init__(self, token: str):
@@ -35,3 +35,4 @@ class MilitaryVerifier:
         )
 
         return await self.engine.poll_result(verification_id)
+
