@@ -12,8 +12,8 @@ MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB
 
 SCHOOLS = {
     '2565': {
-        'id': 'E00468',
-        'idExtended': 'E00468',
+        'id': '2565',
+        'idExtended': '2565',
         'name': 'Harvard University - Main Campus',
         'city': 'Cambridge',
         'state': 'MA',
