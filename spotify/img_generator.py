@@ -13,11 +13,11 @@ def generate_psu_id():
 def generate_psu_email(first_name, last_name):
     """
     生成 PSU 邮箱
-    格式: firstName.lastName + 3-4位数字 @psu.edu
+    格式: firstName.lastName + 3-4位数字 @harvard.edu
     """
     digit_count = random.choice([3, 4])
     digits = ''.join([str(random.randint(0, 9)) for _ in range(digit_count)])
-    email = f"{first_name.lower()}.{last_name.lower()}{digits}@psu.edu"
+    email = f"{first_name.lower()}.{last_name.lower()}{digits}@harvard.edu"
     return email
 
 
