@@ -85,7 +85,7 @@ class NameGenerator:
         }
 
 
-def generate_email(school_domain='MIT.EDU'):
+def generate_email(school_domain='harvard.edu'):
     """
     生成随机学校邮箱
     
