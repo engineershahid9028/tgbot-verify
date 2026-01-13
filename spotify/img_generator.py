@@ -21,7 +21,7 @@ def generate_psu_email(first_name, last_name):
     return email
 
 
-def generate_html(first_name, last_name, school_id='2565'):
+def generate_html(first_name, last_name, school_id='E00468'):
     """
     生成 Penn State LionPATH HTML
 
@@ -340,7 +340,7 @@ def generate_html(first_name, last_name, school_id='2565'):
     return html
 
 
-def generate_image(first_name, last_name, school_id='2565'):
+def generate_image(first_name, last_name, school_id='E00468'):
     """
     生成 Penn State LionPATH 截图 PNG
 
