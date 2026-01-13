@@ -11,7 +11,7 @@ MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB
 # School Configuration - Harvard University (using original IDs)
 
 SCHOOLS = {
-    'E00468': {
+    '2565': {
         'id': E00468,
         'idExtended': 'E00468',
         'name': 'Harvard University - Main Campus',
