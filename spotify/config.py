@@ -12,7 +12,7 @@ MAX_FILE_SIZE = 1 * 1024 * 1024  # 1MB
 
 SCHOOLS = {
     '2565': {
-        'id': E00468,
+        'id': 'E00468',
         'idExtended': 'E00468',
         'name': 'Harvard University - Main Campus',
         'city': 'Cambridge',
@@ -22,7 +22,9 @@ SCHOOLS = {
         'domain': 'HARVARD.EDU',
         'latitude': 42.377003,
         'longitude': -71.116660
-    },
+    }
+}
+
     '651379': {
         'id': 651379,
         'idExtended': '651379',
